@@ -76,6 +76,7 @@
   width: 130px;
   height: 130px;
   object-fit: contain;
+  mix-blend-mode: multiply;
 }
 
 @keyframes logoFloat {
