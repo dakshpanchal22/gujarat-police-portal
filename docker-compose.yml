@@ -1,0 +1,38 @@
+# Docker Compose file for development environment
+# Defines a PostgreSQL 14 database with PostGIS extension
+
+services:
+  # Database service running PostgreSQL 14 with PostGIS
+  db:
+    # Use the official PostGIS image based on PostgreSQL 14
+    image: postgis/postgis:14-3.3
+
+    # Environment variables used to initialize the database on first run
+    environment:
+      POSTGRES_DB: cctv_registry          # Name of the default database to create
+      POSTGRES_USER: cctv_user            # Database administrator username
+      POSTGRES_PASSWORD: secure_password  # Database administrator password
+
+    # Port mapping: host port 5432 is forwarded to the container's port 5432
+    ports:
+      - "5432:5432"
+
+    # Volumes mapped into the container for data persistence
+    volumes:
+      # Named volume 'postgres_data' stores PostgreSQL data files so they
+      # survive container restarts and removals
+      - postgres_data:/var/lib/postgresql/data
+
+    # Healthcheck to determine whether the database is ready to accept connections
+    healthcheck:
+      # Probe command checks if PostgreSQL is ready for the specified user/db
+      test: ["CMD-SHELL", "pg_isready -U cctv_user -d cctv_registry"]
+      interval: 10s  # Time between health checks
+      timeout: 5s    # Time allowed for a single check to complete
+      retries: 5     # Number of consecutive failures before marking unhealthy
+
+# Top-level volumes section
+# Defines named volumes that are managed by Docker and can be referenced by services
+volumes:
+  # Named volume used to persist PostgreSQL data files
+  postgres_data:
